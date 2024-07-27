@@ -1,10 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
+import ExcelReader from './components/pages/Exceldata';
 
 function App() {
   return (
     <div className="App">
-     <h>Hi</h>
+     <ExcelReader />
     </div>
   );
 }
