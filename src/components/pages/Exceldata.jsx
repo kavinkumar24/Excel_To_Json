@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FaSun,FaMoon, FaArrowDown} from 'react-icons/fa';
 
 import { Chart as ChartJs, ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
-import { Bar,Doughnut } from 'react-chartjs-2';
+import { Bar,Doughnut, Pie } from 'react-chartjs-2';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -45,18 +45,66 @@ const Exceldata = () => {
     ],
   });
 
-  
+  const [overallGender, setOverallGender] = useState({
+      labels: ['Male', 'Female'],
+      datasets: [{
+        label: 'Gender Distribution',
+        data: [0, 0],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+        ],
+        hoverOffset: 4,
+        // borderColor: 'white'
+      }]
+  });
   const[loading, setLoading] = useState(false);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          color:  theme==='light'?'black':'white'
+        },
+        grid: {
+          color: theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+        },
+      },
+      y: {
+        ticks: {
+          color:  theme==='light'?'black':'white'
+        },
+        grid: {
+          color: theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color:  theme==='light'?'black':'white',
+        },
+      },
+      title: {
+        display: true,
+        text: 'Chart Title',
+        color:  theme==='light'?'black':'white',
+        borderColor: theme==='light'?'white':'black'
+      },
+    },
+  };
 
   useEffect(() => {
     if (data.length > 0) {
-      // Calculate summary
+      
       const totalFields = data.length;
       const totalMales = data.filter((item) => item.Gender === 'Male').length;
       const totalFemales = data.filter((item) => item.Gender === 'Female').length;
       setSummary({ totalFields, totalMales, totalFemales });
 
-      // Prepare data for the gender bar chart
+      
       const labels = Object.keys(data[0]).filter(key => key !== 'Gender');
       const maleData = labels.map(label => data.filter(item => item.Gender === 'Male').reduce((acc, cur) => acc + parseInt(cur[label] || 0, 10), 0));
       const femaleData = labels.map(label => data.filter(item => item.Gender === 'Female').reduce((acc, cur) => acc + parseInt(cur[label] || 0, 10), 0));
@@ -81,10 +129,15 @@ const Exceldata = () => {
         ],
       });
 
-      // Prepare data for the grades bar chart
+      
       const gradesData = ['A', 'B', 'C'].map((grade) => {
         return data.filter((item) => item.Grade === grade).length;
       });
+
+      const genderData = ['Male','Female'].map((gender)=>{
+        return data.filter((item)=>item.Gender===gender).length;
+      })
+      console.log(genderData)
 
       setGradesBarData({
         labels: ['A', 'B', 'C'],
@@ -99,10 +152,14 @@ const Exceldata = () => {
         ],
       });
 
-      // Prepare data for the sections bar chart
+     
+
+      
+      
       const sectionsData = ['A', 'B', 'C'].map((section) => {
         return data.filter((item) => item.Section === section).length;
       });
+      console.log(sectionsData)
 
       setSectionsBarData({
         labels: ['A', 'B', 'C'],
@@ -110,13 +167,32 @@ const Exceldata = () => {
           {
             label: 'Sections',
             data: sectionsData,
-            backgroundColor: 'rgba(153, 102, 255, 0.6)',
-            borderColor: 'rgba(153, 102, 255, 1)',
+            backgroundColor: [
+              'rgb(255, 99, 132)',
+              'rgb(54, 162, 235)',
+              'Green'
+              
+            ],
+            borderColor: 'lightgray',
+            borderWidth: 1,
+          },
+        ],
+      });
+     
+   
+      setOverallGender({
+        labels: ['Male', 'Female'],
+        datasets: [
+          {
+            data: [totalMales, totalFemales],
+            backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)'],
+            borderColor: ['lightgray'],
             borderWidth: 1,
           },
         ],
       });
     }
+
   }, [data]);
   
   const handleFileChange = (event) => {
@@ -185,54 +261,13 @@ const Exceldata = () => {
     });
     setData(sortedData);
   };
+ 
+  
 
   return (
     <div className={`w-full min-h-screen ${theme==='light'? 'bg-gray-100':'bg-gray-700'}`}>
       
-      {render &&
-      <div className='bg-white shadow-md w-[30%]'>
       
-      <div className="mt-8">
-              <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender Distribution</h3>
-              <div className="mt-4">
-                {barData && <Bar data={barData} />}
-              </div>
-            </div>
-           
-            <div className="mt-8">
-              <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Sections Distribution</h3>
-              <div className="mt-4">
-                {sectionsBarData && <Bar data={sectionsBarData} />}
-              </div>
-            </div>
-      
-      {/* <Doughnut 
-      data={{
-        labels: [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-         
-        ],
-        datasets: [{
-          data:[1,3,2,1,1],
-          backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)',
-            'rgb(173, 86, 255)',
-            'rgb(255,167,99)'
-          ],
-          hoverOffset: 4,
-          borderColor:'white'
-        }]
-      }}
-      
-      /> */}
-      
-      </div>}
      <ToastContainer />
     <div className={`container mx-auto px-4 py-10`}>
     <div className="flex justify-end items-center space-x-4">
@@ -313,6 +348,32 @@ const Exceldata = () => {
             </div>
           
           </div>
+          {render && (
+        <div className='w-full h-full  grid grid-cols-1 md:grid-col-2 md:grid-cols-3  gap-9 '>
+          <div className="mt-8">
+            <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender wise Distribution</h3>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-md p-4 rounded-lg`}>
+              {barData && <Bar data={barData} options={chartOptions} />}
+            </div>
+          </div>
+          
+          <div className="mt-8">
+            <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Sections Distribution</h3>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-md p-4 rounded-lg`}>
+              {sectionsBarData && <Bar data={sectionsBarData} options={chartOptions} />}
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <h3 className={`text-xl font-semibold  ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender Distribution</h3>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-md p-4 rounded-lg`}>
+              {overallGender && <Pie data={overallGender} options={chartOptions} />}
+            </div>
+          </div>
+
+      
+        </div>
+      )}
           <div className="shadow-lg rounded-lg w-full flex justify-center pt-2 overflow-x-auto">
             <div className="block w-full">
           <table className={`min-w-full table-fixed bg-white border rounded-lg mt-4 ${theme === 'light' ? 'border-gray-200' : 'border-gray-500 text-white'}`}>
