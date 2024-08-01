@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaSun,FaMoon, FaArrowDown} from 'react-icons/fa';
+import { FaSun,FaMoon, FaArrowDown,FaArrowLeft,FaArrowRight,FaSearch} from 'react-icons/fa';
 
 import { Chart as ChartJs, ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import { Bar,Doughnut, Pie } from 'react-chartjs-2';
@@ -11,6 +11,8 @@ ChartJs.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearS
 
 const Exceldata = () => {
   const fileInput = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 50;
   const [data, setData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [fileName, setFileName] = useState('');
@@ -55,10 +57,25 @@ const Exceldata = () => {
           'rgb(54, 162, 235)',
         ],
         hoverOffset: 4,
-        // borderColor: 'white'
+        
       }]
   });
   const[loading, setLoading] = useState(false);
+  const [originalData, setOriginalData] = useState([]);
+
+ const[search,setSearch] = useState('')
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(data.length / rowsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  const currentData = data.slice((currentPage-1) * rowsPerPage,currentPage * rowsPerPage);
+
 
   const chartOptions = {
     responsive: true,
@@ -95,6 +112,38 @@ const Exceldata = () => {
       },
     },
   };
+  const [genderFilter, setGenderFilter] = useState('');
+  const [ageFilter, setAgeFilter] = useState(false);
+
+useEffect(() => {
+  let filteredData = originalData;
+
+  if (genderFilter) {
+    filteredData = filteredData.filter(item => item.Gender === genderFilter);
+  }
+
+  if (ageFilter) {
+    filteredData = filteredData.filter(item => item.Age > 13);
+  }
+
+  if (search) {
+    filteredData = filteredData.filter(item => item.Name.toLowerCase().includes(search.toLowerCase()));
+  }
+
+  if (filteredData.length === 0) {
+    setData(originalData);
+  } else {
+    setData(filteredData);
+  }
+}, [search, genderFilter, ageFilter, originalData]);
+
+const handleGenderFilter = (gender) => {
+  setGenderFilter(genderFilter === gender ? '' : gender);
+};
+
+const handleAgeFilter = () => {
+  setAgeFilter(!ageFilter);
+};
 
   useEffect(() => {
     if (data.length > 0) {
@@ -225,6 +274,7 @@ const Exceldata = () => {
         },
       });
       setData(response.data);
+      setOriginalData(response.data);
       setRender(true);
       console.log('File uploaded successfully:', response.data);
     } catch (error) {
@@ -243,7 +293,7 @@ const Exceldata = () => {
 
     setTimeout(()=>{
       setLoading(false);
-    },1100)
+    },1000)
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
@@ -262,10 +312,51 @@ const Exceldata = () => {
     setData(sortedData);
   };
  
+  const[search_spin, setSearch_spin] = useState(false);
+  
+  useEffect(() => {
+    
+    if (search === '') {
+      setData(originalData);
+    } else {
+      const search_data = originalData.filter((item) =>
+        item.Name.toLowerCase().includes(search.toLowerCase())
+      );
+      if (search_data.length === 0) {
+        toast.error('No data found');
+        setData(originalData);
+      } else {
+        setData(search_data);
+      }
+    }
+  }, [search, originalData]);
+  
+  const handlesearch =() =>{
+    
+    const search_data = data.filter((item)=>item.Name.toLowerCase().includes(search.toLowerCase()));
+    console.log(data[0])
+    if(search_data.length === 0){
+      toast.error('No data found');
+        setData(originalData);
+      }
+      else{
+      setData(search_data)
+      }
+  }
+  const handlesearch_input = (e)=>{
+    setSearch_spin(true);
+    setTimeout(()=>{
+      setSearch_spin(false);
+    },500)
+    setSearch(e.target.value);
+
+  }
   
 
+  
+    
   return (
-    <div className={`w-full min-h-screen ${theme==='light'? 'bg-gray-100':'bg-gray-700'}`}>
+    <div className={`w-full min-h-screen ${theme==='light'? 'white':'bg-gray-700'}`}>
       
       
      <ToastContainer />
@@ -352,21 +443,21 @@ const Exceldata = () => {
         <div className='w-full h-full  grid grid-cols-1 md:grid-col-2 md:grid-cols-3  gap-9 '>
           <div className="mt-8">
             <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender wise Distribution</h3>
-            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-md p-4 rounded-lg`}>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-lg p-4 rounded-lg border border-gray-200`}>
               {barData && <Bar data={barData} options={chartOptions} />}
             </div>
           </div>
           
           <div className="mt-8">
             <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Sections Distribution</h3>
-            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-md p-4 rounded-lg`}>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-lg p-4 rounded-lg border border-gray-200`}>
               {sectionsBarData && <Bar data={sectionsBarData} options={chartOptions} />}
             </div>
           </div>
 
           <div className="mt-8">
             <h3 className={`text-xl font-semibold  ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender Distribution</h3>
-            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-md p-4 rounded-lg`}>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-lg p-4 rounded-lg border border-gray-200`}>
               {overallGender && <Pie data={overallGender} options={chartOptions} />}
             </div>
           </div>
@@ -374,7 +465,34 @@ const Exceldata = () => {
       
         </div>
       )}
-          <div className="shadow-lg rounded-lg w-full flex justify-center pt-2 overflow-x-auto">
+      <br></br> 
+      <div className='flex justify-center'>
+      <input type='email'  className=' px-10 mt-10 border border-gray-300  p-2 w-full md:w-[50%] lg:w-[50%] xl:w-[50%] outline-none focus:ring-2 focus:ring-blue-200 rounded-md shadow-md cursor-text' name="search" placeholder="Search"  value={search} onChange={handlesearch_input} />
+      <button className='mt-10 px-8 py-4 bg-sky-500 text-white rounded-md w-20' onClick={handlesearch}>
+      <FaSearch  />
+      </button>
+      </div>
+      <div className="flex justify-center space-x-4 py-4">
+        <button
+          className={`px-4 py-2 rounded-md ${genderFilter === 'Male' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          onClick={() => handleGenderFilter('Male')}
+        >
+          Male
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md ${genderFilter === 'Female' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          onClick={() => handleGenderFilter('Female')}
+        >
+          Female
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md ${ageFilter ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          onClick={handleAgeFilter}
+        >
+          Above 13
+        </button>
+      </div>
+          <div className="shadow-lg rounded-lg w-full flex justify-center pt-2 overflow-x-auto custom-scrollbar">
             <div className="block w-full">
           <table className={`min-w-full table-fixed bg-white border rounded-lg mt-4 ${theme === 'light' ? 'border-gray-200' : 'border-gray-500 text-white'}`}>
           <thead className={`bg-gray-500 ${theme === 'light' ? 'text-white' : 'text-gray-300'}`}>
@@ -383,7 +501,7 @@ const Exceldata = () => {
           <th
             key={key}
             onClick={() => handleSort(key)}
-            className="cursor-pointer px-7 py-3 text-left text-xs font-medium uppercase tracking-wider text-nowrap"
+            className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-nowrap"
             title="sorting"
 
           >
@@ -398,7 +516,7 @@ const Exceldata = () => {
       </tr>
     </thead>
     <tbody>
-      {data.map((row, rowIndex) => (
+      {currentData.map((row, rowIndex) => (
         <tr
           key={rowIndex}
           className={`${
@@ -414,7 +532,7 @@ const Exceldata = () => {
           {Object.values(row).map((value, colIndex) => (
             <td
               key={colIndex}
-              className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
+              className={`px-0 py-4 whitespace-nowrap text-sm font-medium ${
                 theme === 'light' ? 'text-gray-900' : 'text-gray-300'
               }`}
             >
@@ -425,8 +543,28 @@ const Exceldata = () => {
       ))}
     </tbody>
   </table>
+  
   </div>
 </div>
+<div className="flex justify-center items-center mt-4">
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-indigo-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed shadow-md "
+        >
+          <FaArrowLeft />
+        </button>
+        <span className={`p-4 ${theme==='light'?'text-gray-700':'text-gray-100'}`}>
+          Page {currentPage} of {Math.ceil(data.length / rowsPerPage)}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === Math.ceil(data.length / rowsPerPage)}
+          className="px-4 py-2 bg-indigo-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+        >
+          <FaArrowRight />
+        </button>
+      </div>
 
         </>
       )}
@@ -439,6 +577,16 @@ const Exceldata = () => {
           
         </div>
       )}
+      {search_spin&&
+      <div className={`max-w-full bg-opacity-35 max-h-full fixed px-96 2xl:pr-px inset-0 z-50 ${theme==='light'? 'bg-gray-500':'bg-black'}`}>
+      <div className="flex gap-2 max-h-20 w-20 items-center justify-center relative top-72 -left-52 md:top-72 md:left-36 animate-bounce rounded-lg 2xl:left-[35%] lg:left-[45%] 2xl:top-80 
+          3xl:left-96">
+      <div className="w-5 h-5 rounded-full animate-pulse bg-blue-600"></div>
+      <div className="w-5 h-5 rounded-full animate-pulse bg-blue-600"></div>
+      <div className="w-5 h-5 rounded-full animate-pulse bg-blue-600"></div>
+      </div>
+  </div>
+      }
     </div>
   );
 };
