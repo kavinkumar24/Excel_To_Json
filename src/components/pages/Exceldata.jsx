@@ -467,8 +467,8 @@ const handleAgeFilter = () => {
       )}
       <br></br> 
       <div className='flex justify-center'>
-      <input type='email'  className=' px-10 mt-10 border border-gray-300  p-2 w-full md:w-[50%] lg:w-[50%] xl:w-[50%] outline-none focus:ring-2 focus:ring-blue-200 rounded-md shadow-md cursor-text' name="search" placeholder="Search"  value={search} onChange={handlesearch_input} />
-      <button className='mt-10 px-8 py-4 bg-sky-500 text-white rounded-md w-20' onClick={handlesearch}>
+      <input type='email'  className={`px-10 mt-10 border border-gray-300 p-2 w-full md:w-[50%] lg:w-[50%] xl:w-[50%] outline-none focus:ring-2 focus:ring-blue-200 rounded-tl-md rounded-bl-md shadow-md cursor-text ${theme==='light'?'bg-white':'bg-gray-800 border-gray-600 text-indigo-300'}`}name="search" placeholder="Search"  value={search} onChange={handlesearch_input} />
+      <button className='mt-10 px-8 py-4 bg-sky-500 text-white rounded-tr-md rounded-br-md w-20' onClick={handlesearch}>
       <FaSearch  />
       </button>
       </div>
