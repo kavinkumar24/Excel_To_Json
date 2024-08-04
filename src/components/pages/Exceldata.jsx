@@ -371,7 +371,20 @@ const handleAgeFilter = () => {
     <option value="light" className={`${theme === 'light' ? 'bg-gray-100' : 'bg-gray-900 text-white'}`}>Light</option>
   </select>
   <div className="flex items-center px-2 pointer-events-none">
-    {theme === 'light' ? <FaSun className="text-yellow-500" /> : <FaMoon className="text-blue-500" />}
+    {theme === 'light' ? (
+    <div className='bg-slate-100 p-2 rounded-md shadow-lg'>
+    <FaSun className="text-yellow-500" /> 
+    </div>
+    )
+    :
+    (
+    <div className='bg-gray-800 p-2 rounded-md shadow-lg'>
+    <FaMoon className="text-blue-500" />
+    </div>
+    )
+    
+    
+    }
   </div>
   
 </div>
@@ -443,21 +456,21 @@ const handleAgeFilter = () => {
         <div className='w-full h-full  grid grid-cols-1 md:grid-col-2 md:grid-cols-3  gap-9 '>
           <div className="mt-8">
             <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender wise Distribution</h3>
-            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-lg p-4 rounded-lg border border-gray-200`}>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600 border-gray-400'} shadow-lg p-4 rounded-lg border border-gray-200`}>
               {barData && <Bar data={barData} options={chartOptions} />}
             </div>
           </div>
           
           <div className="mt-8">
             <h3 className={`text-xl font-semibold ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Sections Distribution</h3>
-            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-lg p-4 rounded-lg border border-gray-200`}>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600 border-gray-400'} shadow-lg p-4 rounded-lg border border-gray-200`}>
               {sectionsBarData && <Bar data={sectionsBarData} options={chartOptions} />}
             </div>
           </div>
 
           <div className="mt-8">
             <h3 className={`text-xl font-semibold  ${theme === 'light' ? 'text-gray-800' : 'text-gray-50'}`}>Gender Distribution</h3>
-            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600'} shadow-lg p-4 rounded-lg border border-gray-200`}>
+            <div className={`mt-4 h-[50vh] w-[95%] ${theme==='light'? 'bg-white':'bg-gray-600 border-gray-400'} shadow-lg p-4 rounded-lg border border-gray-200`}>
               {overallGender && <Pie data={overallGender} options={chartOptions} />}
             </div>
           </div>
@@ -468,7 +481,7 @@ const handleAgeFilter = () => {
       <br></br> 
       <div className='flex justify-center'>
       <input type='email'  className={`px-10 mt-10 border border-gray-300 p-2 w-full md:w-[50%] lg:w-[50%] xl:w-[50%] outline-none focus:ring-2 focus:ring-blue-200 rounded-tl-md rounded-bl-md shadow-md cursor-text ${theme==='light'?'bg-white':'bg-gray-800 border-gray-600 text-indigo-300'}`}name="search" placeholder="Search"  value={search} onChange={handlesearch_input} />
-      <button className='mt-10 px-8 py-4 bg-sky-500 text-white rounded-tr-md rounded-br-md w-20' onClick={handlesearch}>
+      <button className='mt-10 px-8 py-4 bg-indigo-500 text-white rounded-tr-md rounded-br-md w-20' onClick={handlesearch}>
       <FaSearch  />
       </button>
       </div>
