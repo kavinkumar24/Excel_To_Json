@@ -487,19 +487,19 @@ const handleAgeFilter = () => {
       </div>
       <div className="flex justify-center space-x-4 py-4">
         <button
-          className={`px-4 py-2 rounded-md ${genderFilter === 'Male' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-4 py-2 rounded-md ${genderFilter === 'Male' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'}`}
           onClick={() => handleGenderFilter('Male')}
         >
           Male
         </button>
         <button
-          className={`px-4 py-2 rounded-md ${genderFilter === 'Female' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-4 py-2 rounded-md ${genderFilter === 'Female' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'}`}
           onClick={() => handleGenderFilter('Female')}
         >
           Female
         </button>
         <button
-          className={`px-4 py-2 rounded-md ${ageFilter ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-4 py-2 rounded-md ${ageFilter ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'}`}
           onClick={handleAgeFilter}
         >
           Above 13
