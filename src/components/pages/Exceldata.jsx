@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaSun,FaMoon, FaArrowDown,FaArrowLeft,FaArrowRight,FaSearch} from 'react-icons/fa';
+import { FaSun,FaMoon, FaArrowDown,FaArrowLeft,FaArrowRight,FaSearch, FaTrash} from 'react-icons/fa';
 
 import { Chart as ChartJs, ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import { Bar,Doughnut, Pie } from 'react-chartjs-2';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 ChartJs.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -65,11 +66,19 @@ const Exceldata = () => {
 
  const[search,setSearch] = useState('')
   const handleNextPage = () => {
+    setSearch_spin(true);
+    setTimeout(()=>{
+      setSearch_spin(false);
+    },500)
     if (currentPage < Math.ceil(data.length / rowsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
   const handlePreviousPage = () => {
+    setSearch_spin(true);
+    setTimeout(()=>{
+      setSearch_spin(false);
+    },500)
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -144,6 +153,10 @@ const handleGenderFilter = (gender) => {
 const handleAgeFilter = () => {
   setAgeFilter(!ageFilter);
 };
+const handleClear = () =>{
+  setGenderFilter(false);
+  setAgeFilter(false);
+}
 
   useEffect(() => {
     if (data.length > 0) {
@@ -325,6 +338,7 @@ const handleAgeFilter = () => {
       if (search_data.length === 0) {
         toast.error('No data found');
         setData(originalData);
+        return;
       } else {
         setData(search_data);
       }
@@ -487,22 +501,32 @@ const handleAgeFilter = () => {
       </div>
       <div className="flex justify-center space-x-4 py-4">
         <button
-          className={`px-4 py-2 rounded-md ${genderFilter === 'Male' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-4 py-2 rounded-md ${genderFilter === 'Male'? 'bg-indigo-500 text-white' : `${theme==='light'?'bg-gray-200 text-gray-800':'bg-gray-600 text-white'}`}`}
           onClick={() => handleGenderFilter('Male')}
         >
           Male
         </button>
         <button
-          className={`px-4 py-2 rounded-md ${genderFilter === 'Female' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-2 py-2 rounded-md md:px-4 ${genderFilter === 'Female' ? 'bg-indigo-500 text-white' : `${theme==='light'?'bg-gray-200 text-gray-800':'bg-gray-600 text-white'}`}`}
           onClick={() => handleGenderFilter('Female')}
         >
           Female
         </button>
         <button
-          className={`px-4 py-2 rounded-md ${ageFilter ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-4 py-2 rounded-md ${ageFilter ? 'bg-indigo-500 text-white' : `${theme==='light'?'bg-gray-200 text-gray-800':'bg-gray-600 text-white'}`}`}
           onClick={handleAgeFilter}
         >
           Above 13
+        </button>
+
+        <button
+          className={`${theme==='light'?'bg-gray-200 px-4 py-2 rounded-md text-nowrap flex flex-row  text-gray-800':'bg-gray-600 text-white px-4 py-2 rounded-md flex flex-row '} 'md:py-0'`}
+          onClick={handleClear}
+        >
+          Clear 
+          <div className='py-1 px-1'>
+          <FaTrash />
+          </div>
         </button>
       </div>
           <div className="shadow-lg rounded-lg w-full flex justify-center pt-2 overflow-x-auto custom-scrollbar">
@@ -592,7 +616,7 @@ const handleAgeFilter = () => {
       )}
       {search_spin&&
       <div className={`max-w-full bg-opacity-35 max-h-full fixed px-96 2xl:pr-px inset-0 z-50 ${theme==='light'? 'bg-gray-500':'bg-black'}`}>
-      <div className="flex gap-2 max-h-20 w-20 items-center justify-center relative top-72 -left-52 md:top-72 md:left-36 animate-bounce rounded-lg 2xl:left-[35%] lg:left-[45%] 2xl:top-80 
+      <div className="flex gap-2 max-h-20 w-20 items-center justify-center relative top-72 -left-52 md:top-64 md:left-36 animate-bounce rounded-lg 2xl:left-[35%] lg:left-[45%] 2xl:top-80
           3xl:left-96">
       <div className="w-5 h-5 rounded-full animate-pulse bg-blue-600"></div>
       <div className="w-5 h-5 rounded-full animate-pulse bg-blue-600"></div>
